@@ -1,9 +1,11 @@
+#define GLEW_STATIC
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include <iostream>
 #include <vector>
 #include <GLFW/glfw3.h>
 
+ 
 
 
 int main(void)
@@ -38,7 +40,6 @@ int main(void)
     uint32_t buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float));
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
