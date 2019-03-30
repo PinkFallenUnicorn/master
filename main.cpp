@@ -6,18 +6,20 @@
 
 const GLchar* vertexShaderSource = "#version 420 core\n"
         "layout (location = 0) in vec3 position;\n"
-        "out vec4 vertexColor;\n"
+        "layout (location = 1) in vec3 color;\n"
+        "out vec3 ourColor;\n"
         "void main()\n"
         "{\n"
         "    gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
-        "    vertexColor = vec4(0.5f, 0.0f, 0.0f, 1.0f);\n"
+        "    ourColor = color;\n"
         "}\n\0";
 const GLchar* fragmentShaderSource = "#version 420 core\n"
+        "in vec3 ourColor;\n"
         "out vec4 color;\n"
-        "uniform vec4 ourFirstColor;\n"
+        //"uniform vec4 ourFirstColor;\n"
         "void main()\n"
         "{\n"
-        "   color = ourFirstColor;\n"
+        "   color = vec4(ourColor, 1.0f);\n"
         "}\n\0";
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
@@ -114,14 +116,14 @@ int main()
     glDeleteShader(fragmentShader);
 
     GLfloat vertices1[] = {
-        -0.5f, -0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-         0.5f,  0.5f, 0.0f
+        -0.5f, -0.5f, 0.0f,  0.0f,  0.0f, 1.0f,
+         0.5f, -0.5f, 0.0f,  0.0f,  1.0f, 0.0f,
+         0.5f,  0.5f, 0.0f,  1.0f,  0.0f, 0.0f
     };
     GLfloat vertices2[] = {
-        -0.5f, -0.5f, 0.0f,
-         0.5f,  0.5f, 0.0f,
-        -0.5f,  0.5f, 0.0f
+        -0.5f, -0.5f, 0.0f,  0.0f,  0.0f, 1.0f,
+        -0.5f,  0.5f, 0.0f,  0.0f,  1.0f, 0.0f,
+         0.5f,  0.5f, 0.0f,  1.0f,  0.0f, 0.0f
     };
 
 
@@ -132,8 +134,10 @@ int main()
     glBindVertexArray(VAOs[0]);
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)));
+    glEnableVertexAttribArray(1);
     glBindVertexArray(0);
 
     glGenVertexArrays(1, &VAOs[1]);
@@ -141,9 +145,12 @@ int main()
     glBindVertexArray(VAOs[1]);
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
+    
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)));
+    glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
 
@@ -161,19 +168,11 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
         
         glUseProgram(shaderProgram);
-        GLfloat timeValue = glfwGetTime();
-        GLfloat sinValue = (sin(timeValue)/2) + 0.5;
-        GLfloat cosValue = (cos(timeValue)/2) +0.5;
-        GLint vertexColorLocation = glGetUniformLocation(shaderProgram, "ourFirstColor");
-        glUniform4f(vertexColorLocation, sinValue, sinValue, 0.0f, 1.0f);
 
 
         glBindVertexArray(VAOs[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glBindVertexArray(0);
-
-
-        glUniform4f(vertexColorLocation, 0.0f, 0.0f, cosValue, 1.0f);
         
         glBindVertexArray(VAOs[1]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
