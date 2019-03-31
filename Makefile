@@ -1,10 +1,17 @@
-all: main22 
+all: createexecutable deleteobjects
 
 
-main22: elem.o
-	g++ main.o -o main  -ldl  -lX11 -lpthread  -lGL -lGLEW /usr/local/lib64/libglfw3.a
+createexecutable: compilemain compileshader
+	g++ main.o -o main  -ldl shader.o  -lX11 -lpthread  -lGL -lGLEW /usr/local/lib64/libglfw3.a
 
-elem.o: main.cpp
+compilemain: main.cpp
 	g++ -c main.cpp
 
+compileshader: shader.cpp
+	g++ -c shader.cpp shader.h
+
+deleteobjects: 
+	rm main.o
+	rm shader.o
+	rm shader.h.gch
 
