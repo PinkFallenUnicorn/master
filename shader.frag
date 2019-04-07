@@ -1,8 +1,13 @@
 #version 420 core
 in vec3 ourColor;
-in vec2 foo_;
+in vec2 TexCoord;
+
 out vec4 color;
+
+uniform sampler2D ourTexture;
+
 void main()
 {
-      color = vec4(ourColor.x * foo_.x * foo_.y, ourColor.y * foo_.x, ourColor.z * foo_.y, 1.0f);
+      //color = vec4(ourColor.x, ourColor.y, ourColor.z, 1.0f);
+      color = texture(ourTexture, TexCoord) * vec4(ourColor, 1.0f);
 }

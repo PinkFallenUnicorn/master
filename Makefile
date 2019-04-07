@@ -2,7 +2,7 @@ all: createexecutable deleteobjects
 
 
 createexecutable: compilemain compileshader
-	g++ main.o -o main  -ldl shader.o  -lX11 -lpthread  -lGL -lGLEW /usr/local/lib64/libglfw3.a
+	g++ main.o -o main  -ldl shader.o  -lX11 -lpthread  -lGL -lSOIL -lGLEW /usr/local/lib64/libglfw3.a
 
 compilemain: main.cpp
 	g++ -c main.cpp
