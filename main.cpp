@@ -131,9 +131,10 @@ int main()
     SOIL_free_image_data(image);
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind texture when done, so we won't accidentily mess up our texture.
     
-    glm::mat4 trans(1.f); 
-    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5)); 
-    trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));   
+    //glm::mat4 trans(1.f); 
+    //trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5)); 
+    //trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));   
+    //trans = glm::rotate(trans,(GLfloat)glfwGetTime() * 50.0f, glm::vec3(0.0f, 0.0f, 1.0f));
     while(!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
@@ -144,7 +145,10 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
         
         myShader.Use();
-        trans = glm::rotate(trans, 0.03`f, glm::vec3(0.0, 0.0, 1.0));
+        glm::mat4 trans(1.f); 
+        trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));   
+        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));   
+        trans = glm::rotate(trans, (GLfloat)glfwGetTime() * 1.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 
 
         GLuint transformLoc = glGetUniformLocation(myShader.Program, "transform");
