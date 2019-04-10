@@ -5,6 +5,9 @@
 #include <math.h>
 #include "shader.h"
 #include <SOIL/SOIL.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 
 const GLuint WIDTH = 800, HEIGHT = 600;
@@ -18,6 +21,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 int main()
 {
+
     glfwInit();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -93,9 +97,11 @@ int main()
 
 
     // Load and create a texture 
-    GLuint texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture); // All upcoming GL_TEXTURE_2D operations now have effect on this texture object
+    GLuint texture1;
+    GLuint texture2;
+
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1); // All upcoming GL_TEXTURE_2D operations now have effect on this texture object
     // Set the texture wrapping parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);   // Set texture wrapping to GL_REPEAT (usually basic wrapping method)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -110,23 +116,51 @@ int main()
     SOIL_free_image_data(image);
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind texture when done, so we won't accidentily mess up our texture.
 
-
-
-
-
+    glGenTextures(1, &texture2);
+    glBindTexture(GL_TEXTURE_2D, texture2); // All upcoming GL_TEXTURE_2D operations now have effect on this texture object
+    // Set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);   // Set texture wrapping to GL_REPEAT (usually basic wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // Set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // Load image, create texture and generate mipmaps
+    image = SOIL_load_image("image.jpg", &width, &height, 0, SOIL_LOAD_RGB);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    SOIL_free_image_data(image);
+    glBindTexture(GL_TEXTURE_2D, 0); // Unbind texture when done, so we won't accidentily mess up our texture.
+    
+    glm::mat4 trans(1.f); 
+    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5)); 
+    trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));   
     while(!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
-        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+        GLfloat timeValue = glfwGetTime();
+        GLfloat sinValue = sin(timeValue);
+        GLfloat cosValue = cos(timeValue);
+        glClearColor(0.0f + abs(sinValue), 0.0f + abs(cosValue), 0.0f + abs(sinValue * cosValue), 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         
         myShader.Use();
+        trans = glm::rotate(trans, 0.03`f, glm::vec3(0.0, 0.0, 1.0));
 
 
-        glBindTexture(GL_TEXTURE_2D, texture);
+        GLuint transformLoc = glGetUniformLocation(myShader.Program, "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glUniform1i(glGetUniformLocation(myShader.Program, "ourTexture1"), 0);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
+        glUniform1i(glGetUniformLocation(myShader.Program, "ourTexture2"), 1);  
+        
+        // Draw container
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+        
 
         glfwSwapBuffers(window);
     }
